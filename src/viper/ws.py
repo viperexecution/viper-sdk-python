@@ -50,6 +50,7 @@ import asyncio
 import hashlib
 import hmac
 import json
+import os
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -251,6 +252,52 @@ class ViperWSClient:
         # first frame via this Event so connect() can absorb the limits.
         self._welcome: Optional[dict] = None
         self._welcome_event: Optional[asyncio.Event] = None
+
+    # --------------------------------------------------------------- env ctor
+    @classmethod
+    def from_env(cls, **overrides) -> "ViperWSClient":
+        """
+        Construct a client from environment variables — the zero-boilerplate
+        entry point. Reads:
+
+            VIPER_API_KEY     -> api_key_id   (required)
+            VIPER_API_SECRET  -> api_secret   (required)
+            VIPER_HANDLE      -> handle       (optional)
+            VIPER_WALLET      -> wallet       (optional, lower-cased)
+            VIPER_WS_URL      -> ws_url       (optional; defaults to mainnet)
+
+        Any keyword argument is passed straight through to __init__ and wins
+        over the environment, so callbacks and overrides slot in naturally:
+
+            client = ViperWSClient.from_env(on_event=handle_frame)
+
+        Raises RuntimeError naming the first missing required variable.
+        """
+        def _require(name: str) -> str:
+            val = os.environ.get(name)
+            if not val:
+                raise RuntimeError(
+                    f"{name} is not set. ViperWSClient.from_env() requires "
+                    f"VIPER_API_KEY and VIPER_API_SECRET "
+                    f"(VIPER_HANDLE and VIPER_WALLET are optional)."
+                )
+            return val
+
+        params = {
+            "api_key_id": _require("VIPER_API_KEY"),
+            "api_secret": _require("VIPER_API_SECRET"),
+        }
+        handle = os.environ.get("VIPER_HANDLE")
+        if handle:
+            params["handle"] = handle
+        wallet = os.environ.get("VIPER_WALLET")
+        if wallet:
+            params["wallet"] = wallet.lower()
+        ws_url = os.environ.get("VIPER_WS_URL")
+        if ws_url:
+            params["ws_url"] = ws_url
+        params.update(overrides)   # explicit kwargs override the environment
+        return cls(**params)
 
     # ----------------------------------------------------------------- utils
     def _lock(self) -> asyncio.Lock:

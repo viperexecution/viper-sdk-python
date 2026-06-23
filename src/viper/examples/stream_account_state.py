@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 """
-Example 01 — stream account.state and route frames by data.wallet.
+Stream account.state and route frames by data.wallet.
 
 The minimal end-to-end shape every Viper bot starts from: connect, subscribe,
 handle live frames, shut down cleanly. The fuller "detect signal -> fire
-Glidemaker" example builds on this skeleton.
+Glidemaker" examples build on this skeleton.
 
-Run:
+Run (after `pip install viper-execution`):
     export VIPER_API_KEY=vk_...
-    export VIPER_API_SECRET=...
-    export VIPER_HANDLE=your-handle
-    export VIPER_WALLET=0x...
-    python examples/01_stream_account_state.py
+    export VIPER_API_SECRET=vs_...
+    export VIPER_HANDLE=your-handle        # optional
+    export VIPER_WALLET=0x...              # the wallet to stream
+    viper-examples stream-account-state
 """
 import os
 import asyncio
+
 from viper import ViperWSClient
+
+ORDER = 1
+DESCRIPTION = "Stream account.state; route frames by data.wallet."
 
 
 async def main():
-    api_key = os.environ["VIPER_API_KEY"]
-    api_secret = os.environ["VIPER_API_SECRET"]
-    handle = os.environ.get("VIPER_HANDLE", "")
-    wallet = os.environ["VIPER_WALLET"].lower()
+    wallet = os.environ.get("VIPER_WALLET", "").strip().lower()
+    if not wallet:
+        raise SystemExit("Set VIPER_WALLET to the wallet you want to stream.")
 
     def on_event(frame):
         ev = frame.get("event")
@@ -34,10 +37,9 @@ async def main():
     def on_terminal(code):
         print(f"# terminal close (code={code}) — stopping")
 
-    client = ViperWSClient(
-        api_key_id=api_key,
-        api_secret=api_secret,
-        handle=handle,
+    # from_env() reads VIPER_API_KEY / VIPER_API_SECRET / VIPER_HANDLE.
+    # Explicit kwargs (wallet, callbacks) override the environment.
+    client = ViperWSClient.from_env(
         wallet=wallet,
         on_event=on_event,
         on_terminal=on_terminal,
