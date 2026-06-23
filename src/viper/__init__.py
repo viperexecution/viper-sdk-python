@@ -30,7 +30,12 @@ Note: the SDK version is independent of the API version. This is SDK 0.x
 against API v1.
 """
 
-__version__ = "0.1.0"
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
+
+try:
+    __version__ = _pkg_version("viper-execution")
+except PackageNotFoundError:  # running from a source tree without an install
+    __version__ = "0.0.0+unknown"
 
 from .ws import (
     ViperWSClient,
