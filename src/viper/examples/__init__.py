@@ -21,9 +21,21 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import os
 import pkgutil
 import sys
 from typing import Dict, List, Tuple
+
+
+# Single source for both the descriptive catalog table and the platform-aware
+# set-commands below — keeps the two renderings from drifting.
+# (name, table hint, requirement, set-command placeholder value)
+_ENV_VARS = [
+    ("VIPER_API_KEY",    "(vk_...)",        "required",          "vk_..."),
+    ("VIPER_API_SECRET", "(vs_...)",        "required",          "vs_..."),
+    ("VIPER_HANDLE",     "your handle",     "optional",          "your-handle"),
+    ("VIPER_WALLET",     "0x... to stream", "example-dependent", "0x..."),
+]
 
 
 def _discover() -> List[Tuple[str, str, int, str]]:
@@ -59,6 +71,23 @@ def _resolve(token: str, catalog) -> str | None:
     return None
 
 
+def _print_env_setup() -> None:
+    print("Required env vars (live examples):")
+    for name, hint, req, _val in _ENV_VARS:
+        print(f"    {name:<20}{hint:<20}{req}")
+    print()
+    # Copy-paste setup for the running shell.
+    if os.name == "nt":
+        print("Set them for your shell (PowerShell):")
+        for name, _hint, _req, val in _ENV_VARS:
+            print(f'    $env:{name} = "{val}"')
+        print("    # cmd.exe:  set VIPER_API_KEY=vk_...   (no $env:, no quotes)")
+    else:
+        print("Set them for your shell (bash/zsh):")
+        for name, _hint, _req, val in _ENV_VARS:
+            print(f'    export {name}="{val}"')
+
+
 def _print_catalog(catalog) -> None:
     print("Viper SDK — Examples")
     print("====================")
@@ -72,11 +101,7 @@ def _print_catalog(catalog) -> None:
         for slug, _mod, order, desc in catalog:
             print(f"  {order:02d}  {slug.ljust(width)}   {desc}")
     print()
-    print("Required env vars (live examples):")
-    print("    VIPER_API_KEY       (vk_...)            required")
-    print("    VIPER_API_SECRET    (vs_...)            required")
-    print("    VIPER_HANDLE        your handle         optional")
-    print("    VIPER_WALLET        0x... to stream     example-dependent")
+    _print_env_setup()
     print()
     print("Examples:")
     print("    viper-examples list")

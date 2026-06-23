@@ -2,7 +2,7 @@
 
 Institutional-grade Python client for the [Viper Execution](https://viperexecution.com) trading API on Hyperliquid.
 
-> **Status:** SDK `0.1.1` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version — this is SDK 0.x against API v1.
+> **Status:** SDK `0.1.2` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version — this is SDK 0.x against API v1.
 
 ## Install
 
@@ -34,13 +34,23 @@ async def main():
 asyncio.run(main())
 ```
 
-Prefer to pass credentials directly instead of via the environment? The
-constructor takes them explicitly:
+## Using credentials
+
+`ViperWSClient` takes credentials two ways, both first-class — pick whichever fits how your process gets its secrets.
+
+**From the environment (quickest, and production-correct).** `from_env()` reads `VIPER_API_KEY`, `VIPER_API_SECRET`, `VIPER_HANDLE`, and `VIPER_WALLET`. This is also the right pattern for deployment: containers, CI, and secret managers all inject secrets as env vars, so the same code runs unchanged from laptop to production. Anything passed explicitly overrides the environment:
 
 ```python
+client = ViperWSClient.from_env(handle="override-handle")
+```
+
+**Explicitly (your own secret store).** If your keys live in Vault, AWS Secrets Manager, an HSM, or a config file, fetch them in your code and pass them to the constructor directly — `from_env()` is never required:
+
+```python
+api_key_id, api_secret = my_secret_store.get("viper")  # however you fetch them
 client = ViperWSClient(
-    api_key_id="vk_...",
-    api_secret="...",
+    api_key_id=api_key_id,
+    api_secret=api_secret,
     handle="your-handle",
     wallet="0x...",
     on_event=lambda f: print(f["channel"], f.get("event")),
@@ -58,13 +68,22 @@ viper-examples stream-account-state     # run by name
 viper-examples 01                       # ...or by number
 ```
 
-Set the env vars the examples read:
+Set the env vars the examples read — bash/zsh:
 
 ```bash
 export VIPER_API_KEY=vk_...
 export VIPER_API_SECRET=vs_...
 export VIPER_HANDLE=your-handle     # optional
 export VIPER_WALLET=0x...           # the wallet to stream
+```
+
+…or PowerShell:
+
+```powershell
+$env:VIPER_API_KEY = "vk_..."
+$env:VIPER_API_SECRET = "vs_..."
+$env:VIPER_HANDLE = "your-handle"   # optional
+$env:VIPER_WALLET = "0x..."         # the wallet to stream
 ```
 
 The source for each example lives in
