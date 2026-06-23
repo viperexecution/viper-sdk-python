@@ -2,7 +2,7 @@
 
 Institutional-grade Python client for the [Viper Execution](https://viperexecution.com) trading API on Hyperliquid.
 
-> **Status:** SDK `0.1.0` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version — this is SDK 0.x against API v1.
+> **Status:** SDK `0.1.1` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version — this is SDK 0.x against API v1.
 
 ## Install
 
@@ -15,26 +15,60 @@ Requires Python ≥ 3.10.
 ## Quickstart
 
 ```python
+import os
 import asyncio
 from viper import ViperWSClient
 
 async def main():
-    client = ViperWSClient(
-        api_key_id="vk_...",
-        api_secret="...",
-        handle="your-handle",
-        wallet="0x...",
+    # from_env() reads VIPER_API_KEY / VIPER_API_SECRET / VIPER_HANDLE /
+    # VIPER_WALLET. Pass anything explicitly to override the environment.
+    wallet = os.environ["VIPER_WALLET"].lower()
+    client = ViperWSClient.from_env(
         on_event=lambda f: print(f["channel"], f.get("event")),
     )
     await client.start()
-    await client.subscribe("account.state", "0x...")
+    await client.subscribe("account.state", wallet)
     await asyncio.sleep(30)
     await client.close()
 
 asyncio.run(main())
 ```
 
-See [`examples/`](examples/) for runnable scripts.
+Prefer to pass credentials directly instead of via the environment? The
+constructor takes them explicitly:
+
+```python
+client = ViperWSClient(
+    api_key_id="vk_...",
+    api_secret="...",
+    handle="your-handle",
+    wallet="0x...",
+    on_event=lambda f: print(f["channel"], f.get("event")),
+)
+```
+
+## Runnable examples
+
+Examples ship inside the package — no extra downloads. List the catalog and
+run one by name or number:
+
+```bash
+viper-examples                          # list the catalog
+viper-examples stream-account-state     # run by name
+viper-examples 01                       # ...or by number
+```
+
+Set the env vars the examples read:
+
+```bash
+export VIPER_API_KEY=vk_...
+export VIPER_API_SECRET=vs_...
+export VIPER_HANDLE=your-handle     # optional
+export VIPER_WALLET=0x...           # the wallet to stream
+```
+
+The source for each example lives in
+[`src/viper/examples/`](src/viper/examples/).
 
 ## What the WebSocket client handles for you
 
