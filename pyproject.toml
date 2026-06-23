@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "viper-execution"
-version = "0.1.2"
+version = "0.1.3"
 description = "Institutional-grade Python SDK for the Viper Execution trading API on Hyperliquid."
 readme = "README.md"
 requires-python = ">=3.10"
