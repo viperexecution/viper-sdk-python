@@ -2,7 +2,7 @@
 
 Institutional-grade Python client for the [Viper Execution](https://viperexecution.com) trading API on Hyperliquid.
 
-> **Status:** SDK `0.1.6` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version â€” this is SDK 0.x against API v1.
+> **Status:** SDK `0.1.7` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version â€” this is SDK 0.x against API v1.
 
 ## Install
 
@@ -98,7 +98,7 @@ viper-examples start-pacemaker      # TWAP
 These place **real orders on mainnet** (there is no testnet). Each one reads
 the live BTC mark from `/v1/instruments`, sizes the order to a USD notional,
 prints exactly what it is about to do with a short Ctrl-C abort window, fires
-once, observes briefly, then cancels. Optional knobs:
+once, streams the execution's frames (fills, slices, status), then cancels. Optional knobs:
 
 ```bash
 export VIPER_EXAMPLE_USD=250         # target notional (default 250)

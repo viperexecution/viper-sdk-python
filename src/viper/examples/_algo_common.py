@@ -12,8 +12,9 @@ What run_algo does, in order:
      Nothing is sent during this window — abort here places no order.
   4. Connect over WS and fire ONE start_algo command (single-fire; an
      idempotency_key guards against an accidental double-send).
-  5. Observe briefly (default 10s — a passive/TWAP algo may or may not fill in
-     that window), then cancel the launched execution and close.
+  5. Subscribe to execution.state and stream its frames (fills, slices, status)
+     for a short window (default 10s — a passive/TWAP algo may or may not fill
+     in that window), then cancel the execution and close.
 
 These examples place REAL orders on mainnet. There is no testnet.
 
@@ -108,6 +109,20 @@ def _result_field(res: dict, *keys):
     return None
 
 
+def _on_exec_frame(frame: dict) -> None:
+    """Print execution.state frames as they stream (fills, slices, status)."""
+    if frame.get("channel") != "execution.state":
+        return
+    data = frame.get("data") or {}
+    # Print whatever fields the server sends — no field-name guessing. Cap the
+    # line so a verbose hydration frame doesn't wall the terminal.
+    fields = " ".join(f"{k}={data[k]}" for k in data)
+    if len(fields) > 240:
+        fields = fields[:237] + "..."
+    print(f"  [execution.state/{frame.get('event')}] "
+          f"seq={frame.get('seq')} {fields}".rstrip())
+
+
 async def run_algo(*, algo: str, side: str, params: dict, label: str,
                    client_correlation_id: str) -> int:
     """Size from live mark, disclose + abort window, fire once over WS, cancel."""
@@ -128,7 +143,7 @@ async def run_algo(*, algo: str, side: str, params: dict, label: str,
     await asyncio.sleep(ABORT_S)  # KeyboardInterrupt during this aborts before any fire
 
     # 3) connect and fire exactly once.
-    client = ViperWSClient.from_env(wallet=wallet)
+    client = ViperWSClient.from_env(wallet=wallet, on_event=_on_exec_frame)
     await client.start()
     try:
         frame = {
@@ -152,19 +167,23 @@ async def run_algo(*, algo: str, side: str, params: dict, label: str,
         print(f"# {label}: {res.get('result')} execution_id={exec_id} "
               f"status={_result_field(res, 'status')}")
 
-        # 4) observe, then cancel (a passive/TWAP algo may or may not fill here).
-        if exec_id and not NO_CANCEL:
-            print(f"# observing {OBSERVE_S:.0f}s, then cancelling...")
+        # 4) subscribe to the execution and stream its frames (fills, slices,
+        #    status) for the observe window — a passive/TWAP algo may or may not
+        #    fill here. Then cancel unless told to leave it running.
+        if exec_id:
+            print(f"# streaming execution.state for {OBSERVE_S:.0f}s...")
+            await client.subscribe("execution.state", exec_id, cadence_bearing=True)
             await asyncio.sleep(OBSERVE_S)
-            cancel = await client.send_command({
-                "command": "cancel_execution", "execution_id": exec_id,
-                "idempotency_key": uuid.uuid4().hex,
-                "client_correlation_id": f"cancel-{client_correlation_id}",
-            })
-            verdict = (cancel or {}).get("result") or (cancel or {}).get("error") or "(no ack)"
-            print(f"# {label}: cancel -> {verdict}")
-        elif exec_id and NO_CANCEL:
-            print(f"# VIPER_EXAMPLE_NO_CANCEL set — leaving {exec_id} running.")
+            if NO_CANCEL:
+                print(f"# VIPER_EXAMPLE_NO_CANCEL set — leaving {exec_id} running.")
+            else:
+                cancel = await client.send_command({
+                    "command": "cancel_execution", "execution_id": exec_id,
+                    "idempotency_key": uuid.uuid4().hex,
+                    "client_correlation_id": f"cancel-{client_correlation_id}",
+                })
+                verdict = (cancel or {}).get("result") or (cancel or {}).get("error") or "(no ack)"
+                print(f"# {label}: cancel -> {verdict}")
         return 0
     finally:
         await client.close()
