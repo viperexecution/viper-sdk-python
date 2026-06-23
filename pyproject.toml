@@ -34,7 +34,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://www.viperexecution.com"
+Homepage = "https://viperexecution.com"
 Documentation = "https://docs.viperexecution.com"
 Repository = "https://github.com/viperexecution/viper-sdk-python"
 Issues = "https://github.com/viperexecution/viper-sdk-python/issues"
