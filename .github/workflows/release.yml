@@ -11,9 +11,40 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # full history + main, so the guard can compare the tag to main's tip
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      # Release guard. The publish job (needs: build) runs only if this passes,
+      # so a tag failing either check never reaches PyPI, where versions are
+      # immutable. Two checks:
+      #   1. Tag name matches the pyproject version.
+      #   2. Tag commit is the tip of main. A version comparison alone is
+      #      insufficient: a tag can reference a commit behind main while the
+      #      version string is unchanged, so commit identity is compared directly.
+      - name: Validate release tag
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VER="v$(grep -E '^version *= *"' pyproject.toml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')"
+          echo "tag=$TAG  pyproject=$VER"
+          if [ "$TAG" != "$VER" ]; then
+            echo "::error::Tag $TAG does not match pyproject version $VER."
+            exit 1
+          fi
+          git fetch --quiet origin main
+          TAG_SHA="$(git rev-parse HEAD)"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          echo "tag_sha=$TAG_SHA  main_sha=$MAIN_SHA"
+          if [ "$TAG_SHA" != "$MAIN_SHA" ]; then
+            echo "::error::Tag commit is not the tip of main. Re-point the tag to main before releasing."
+            exit 1
+          fi
+          echo "Release tag validated: $TAG at $TAG_SHA"
+
       - name: Build sdist and wheel
         run: |
           python -m pip install --upgrade build
