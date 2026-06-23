@@ -2,7 +2,7 @@
 
 Institutional-grade Python client for the [Viper Execution](https://viperexecution.com) trading API on Hyperliquid.
 
-> **Status:** SDK `0.2.x` (beta). Ships a typed async REST client (`ViperRestClient`) and a resilient WebSocket client (`ViperWSClient`). The SDK version is independent of the API version — this is SDK 0.x against API v1.
+> **Status:** SDK `0.2.x`. Ships a typed async REST client (`ViperRestClient`) and a resilient WebSocket client (`ViperWSClient`). The SDK version is independent of the API version — this is SDK 0.x against API v1.
 
 The SDK is a convenience layer over the raw HMAC + REST/WebSocket surface — never required. Every response is returned as a plain `dict`, so you are never boxed out of the raw payload; the typed signatures and `TypedDict` hints are there for editor and type-checker support only.
 
