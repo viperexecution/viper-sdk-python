@@ -36,6 +36,8 @@ dev = [
 [project.urls]
 Homepage = "https://www.viperexecution.com"
 Documentation = "https://docs.viperexecution.com"
+Repository = "https://github.com/viperexecution/viper-sdk-python"
+Issues = "https://github.com/viperexecution/viper-sdk-python/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/viper"]
