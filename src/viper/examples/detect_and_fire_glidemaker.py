@@ -101,11 +101,12 @@ async def main():
     _require_env()
     rest = ViperRestClient.from_env()
     async with rest:
-        # 1) size off the live instrument
-        inst = await rest.instrument(SYMBOL)
-        mark = float(inst["mark_price"])
-        size = _compute_size(USD, mark, inst.get("sz_decimals", 5),
-                             float(inst.get("min_order_value_size") or 0))
+        # 1) size off the live instrument. GET /v1/instruments/{symbol} wraps the
+        #    record under "instrument" (alongside a validation_example).
+        rec = (await rest.instrument(SYMBOL))["instrument"]
+        mark = float(rec["mark_price"])
+        size = _compute_size(USD, mark, rec.get("sz_decimals", 5),
+                             float(rec.get("min_order_value_size") or 0))
 
         # 2) watch for the signal
         if not await _detect_signal(rest):
@@ -149,8 +150,10 @@ async def main():
                 except ViperError as e:
                     print(f"#   status poll failed: {type(e).__name__} code={e.code}")
                     break
-                print(f"#   execution status={st.get('status')} "
-                      f"filled={st.get('filled_size')}/{st.get('total_size')}")
+                state = st.get("state") or {}
+                print(f"#   execution status={state.get('status')} "
+                      f"filled={state.get('filled_size')}/{state.get('total_size')} "
+                      f"({state.get('filled_pct')}%) maker={state.get('maker_fill_size')}")
             if NO_CANCEL:
                 print(f"# VIPER_EXAMPLE_NO_CANCEL set — leaving {exec_id} running.")
             else:
