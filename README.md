@@ -2,7 +2,7 @@
 
 Institutional-grade Python client for the [Viper Execution](https://viperexecution.com) trading API on Hyperliquid.
 
-> **Status:** SDK `0.1.7` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version â€” this is SDK 0.x against API v1.
+> **Status:** SDK `0.2.0` (beta). Ships the resilient WebSocket client and the resync REST-fetch mapping. The full typed REST client lands in a subsequent release. The SDK version is independent of the API version â€” this is SDK 0.x against API v1.
 
 ## Install
 

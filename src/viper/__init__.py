@@ -3,8 +3,7 @@
 Institutional-grade client for the Viper Execution trading API on Hyperliquid.
 
 This release ships the resilient WebSocket client (`ViperWSClient`) and the
-resync REST-fetch mapping. The full typed REST client lands in a subsequent
-release.
+typed REST client (`ViperRestClient`).
 
 Quickstart:
 
@@ -43,11 +42,31 @@ from .ws import (
     resync_endpoint,
     make_rest_fetcher,
 )
+from .rest import ViperRestClient
+from .exceptions import (
+    ViperError,
+    ViperAuthError,
+    ViperConnectionError,
+    ViperRateLimitError,
+    ViperAPIError,
+    ViperValidationError,
+    ViperConflictError,
+    ViperNotFoundError,
+)
 
 __all__ = [
     "ViperWSClient",
+    "ViperRestClient",
     "RESYNC_ENDPOINTS",
     "resync_endpoint",
     "make_rest_fetcher",
+    "ViperError",
+    "ViperAuthError",
+    "ViperConnectionError",
+    "ViperRateLimitError",
+    "ViperAPIError",
+    "ViperValidationError",
+    "ViperConflictError",
+    "ViperNotFoundError",
     "__version__",
 ]
