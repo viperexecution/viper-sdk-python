@@ -59,4 +59,4 @@ The `/v1/ws` stream has a number of behaviors a naive client gets wrong. `ViperW
 
 ## License
 
-Proprietary. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

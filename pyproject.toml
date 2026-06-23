@@ -13,6 +13,7 @@ authors = [{ name = "Viper Execution" }]
 keywords = ["viper", "hyperliquid", "trading", "algotrading", "websocket"]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Financial and Insurance Industry",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
