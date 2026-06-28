@@ -38,7 +38,7 @@ _ENV_VARS = [
 ]
 
 
-def _discover() -> List[Tuple[str, str, int, str]]:
+def _discover() -> List[Tuple[str, str, int, str, str]]:
     """Return [(slug, module_name, order, description), ...] sorted by order."""
     found = []
     for info in pkgutil.iter_modules(__path__):
@@ -49,13 +49,15 @@ def _discover() -> List[Tuple[str, str, int, str]]:
         if not hasattr(mod, "main") or not hasattr(mod, "DESCRIPTION"):
             continue
         order = int(getattr(mod, "ORDER", 999))
+        kind = str(getattr(mod, "KIND", "rest")).lower()
+        section = str(getattr(mod, "SECTION", "Other"))
         slug = name.replace("_", "-")
-        found.append((slug, name, order, str(mod.DESCRIPTION)))
+        found.append((slug, name, order, str(mod.DESCRIPTION), kind, section))
     found.sort(key=lambda r: (r[2], r[0]))
     return found
 
 
-def list_examples() -> List[Tuple[str, str, int, str]]:
+def list_examples() -> List[Tuple[str, str, int, str, str]]:
     """Public helper: the discovered example catalog."""
     return _discover()
 
@@ -63,7 +65,7 @@ def list_examples() -> List[Tuple[str, str, int, str]]:
 def _resolve(token: str, catalog) -> str | None:
     """Map a user token (slug, module name, or order number) to a module name."""
     t = token.strip().lower().replace("_", "-")
-    for slug, mod_name, order, _desc in catalog:
+    for slug, mod_name, order, _desc, _kind, _section in catalog:
         if t == slug or t == mod_name.replace("_", "-"):
             return mod_name
         if t.lstrip("0") == str(order) or t == f"{order:02d}":
@@ -88,6 +90,18 @@ def _print_env_setup() -> None:
             print(f'    export {name}="{val}"')
 
 
+# Section display order for the catalog listing. Sections not listed here are
+# appended afterward (alphabetically) under their own header.
+_SECTION_ORDER = [
+    "Getting Started",
+    "Algorithms",
+    "Account & Market Data",
+    "Monitors",
+    "Streaming (WebSocket reads)",
+    "Trading over WebSocket (Tier-3 writes)",
+]
+
+
 def _print_catalog(catalog) -> None:
     print("Viper SDK — Examples")
     print("====================")
@@ -96,10 +110,19 @@ def _print_catalog(catalog) -> None:
     if not catalog:
         print("  (no examples found)")
     else:
-        print("Available examples:")
         width = max(len(s) for s, *_ in catalog)
-        for slug, _mod, order, desc in catalog:
-            print(f"  {order:02d}  {slug.ljust(width)}   {desc}")
+        # Group by section, ordered by _SECTION_ORDER (others appended A-Z).
+        by_section = {}
+        for row in catalog:
+            by_section.setdefault(row[5], []).append(row)
+        ordered = [s for s in _SECTION_ORDER if s in by_section]
+        ordered += sorted(s for s in by_section if s not in _SECTION_ORDER)
+        for sec in ordered:
+            print(f"\n{sec}")
+            print("  " + "-" * len(sec))
+            for slug, _mod, order, desc, kind, _section in by_section[sec]:
+                tag = "[WS]  " if kind == "ws" else "[REST]"
+                print(f"  {order:02d}  {tag}  {slug.ljust(width)}   {desc}")
     print()
     _print_env_setup()
     print()

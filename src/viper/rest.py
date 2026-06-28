@@ -345,21 +345,196 @@ class ViperRestClient:
                                    idempotency=True, idempotency_key=idempotency_key,
                                    mutating=True)
 
+    # ============================================================ MONITORS
+    # Reads.
+    async def monitors(self, **query):
+        return await self._request("GET", "/v1/monitors", query=query)
+
+    async def monitor(self, monitor_id: str):
+        return await self._request("GET", f"/v1/monitors/{monitor_id}")
+
+    async def monitors_status(self):
+        return await self._request("GET", "/v1/monitors/status")
+
+    async def monitor_stats(self, monitor_id: Optional[str] = None):
+        path = f"/v1/monitors/{monitor_id}/stats" if monitor_id else "/v1/monitors/stats"
+        return await self._request("GET", path)
+
+    async def monitor_live_stats(self, monitor_id: Optional[str] = None):
+        path = (f"/v1/monitors/{monitor_id}/live-stats" if monitor_id
+                else "/v1/monitors/live-stats")
+        return await self._request("GET", path)
+
+    async def monitor_events(self, monitor_id: Optional[str] = None, **query):
+        path = (f"/v1/monitors/{monitor_id}/events" if monitor_id
+                else "/v1/monitors/events")
+        return await self._request("GET", path, query=query)
+
+    async def monitor_executions(self, monitor_id: Optional[str] = None, **query):
+        path = (f"/v1/monitors/{monitor_id}/executions" if monitor_id
+                else "/v1/monitors/executions")
+        return await self._request("GET", path, query=query)
+
+    async def monitor_alerts(self, **query):
+        return await self._request("GET", "/v1/monitors/alerts", query=query)
+
+    # Mutating. create_monitor builds the body from kwargs; pass type/coins/
+    # action/value_threshold/order_action/... (see the monitor examples).
+    async def create_monitor(self, *, idempotency_key: Optional[str] = None, **fields):
+        return await self._request("POST", "/v1/monitors", body=self._body(**fields),
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def validate_monitor(self, *, idempotency_key: Optional[str] = None, **fields):
+        return await self._request("POST", "/v1/monitors/validate", body=self._body(**fields),
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def update_monitor(self, monitor_id: str, *,
+                             idempotency_key: Optional[str] = None, **fields):
+        return await self._request("PUT", f"/v1/monitors/{monitor_id}",
+                                   body=self._body(**fields), idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def delete_monitor(self, monitor_id: str, *,
+                             idempotency_key: Optional[str] = None):
+        return await self._request("DELETE", f"/v1/monitors/{monitor_id}",
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def trigger_monitor(self, monitor_id: str, *,
+                              idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/{monitor_id}/trigger",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def enable_monitor(self, monitor_id: str, *, enabled: bool,
+                             idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/{monitor_id}/enable",
+                                   body=self._body(enabled=enabled), idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def reset_monitor(self, monitor_id: str, *,
+                            idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/{monitor_id}/reset",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def stop_monitor(self, monitor_id: str, *,
+                           idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/{monitor_id}/stop",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def archive_monitor(self, monitor_id: str, *,
+                              idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/{monitor_id}/archive",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def restore_monitor(self, monitor_id: str, *,
+                              idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/{monitor_id}/restore",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    # Alerts.
+    async def read_alert(self, alert_id: str, *, idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/monitors/alerts/{alert_id}/read",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def read_all_alerts(self, *, idempotency_key: Optional[str] = None):
+        return await self._request("POST", "/v1/monitors/alerts/read-all",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    async def clear_alerts(self, *, idempotency_key: Optional[str] = None):
+        return await self._request("POST", "/v1/monitors/alerts/clear",
+                                   body={}, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
+    # Fleet lifecycle.
+    async def pause_all_monitors(self, *, idempotency_key: Optional[str] = None, **fields):
+        return await self._request("POST", "/v1/monitors/pause-all", body=self._body(**fields),
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def resume_all_monitors(self, *, idempotency_key: Optional[str] = None):
+        return await self._request("POST", "/v1/monitors/resume-all", body={},
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def stop_all_monitors(self, *, idempotency_key: Optional[str] = None):
+        return await self._request("POST", "/v1/monitors/stop-all", body={},
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    # ============================================================== BASKETS
+    async def place_basket(self, *, symbol: str, legs: list,
+                           group_name: Optional[str] = None,
+                           group_id: Optional[str] = None,
+                           idempotency_key: Optional[str] = None, **extra):
+        """Atomic basket: 2-10 legs on one symbol. Each leg: {algo, side,
+        total_size, limit_price?, params?, ...}."""
+        body = self._body(symbol=symbol, legs=legs, group_name=group_name,
+                          group_id=group_id, **extra)
+        return await self._request("POST", "/v1/baskets", body=body,
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def baskets(self, **query):
+        return await self._request("GET", "/v1/baskets", query=query or None)
+
+    async def basket(self, group_id: str):
+        return await self._request("GET", f"/v1/baskets/{group_id}")
+
+    async def basket_logs(self, group_id: str):
+        return await self._request("GET", f"/v1/baskets/{group_id}/logs")
+
+    async def pause_basket(self, group_id: str, *,
+                           idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/baskets/{group_id}/pause", body={},
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def resume_basket(self, group_id: str, *,
+                            idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/baskets/{group_id}/resume", body={},
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def stop_basket(self, group_id: str, *,
+                          idempotency_key: Optional[str] = None):
+        """Cancel all running and paused member executions in the basket."""
+        return await self._request("POST", f"/v1/baskets/{group_id}/stop", body={},
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
+    async def archive_basket(self, group_id: str, *,
+                             idempotency_key: Optional[str] = None):
+        return await self._request("POST", f"/v1/baskets/{group_id}/archive", body={},
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
     async def nuke(self, *, confirm: bool, scope: Optional[str] = None,
-                   symbol: Optional[str] = None,
+                   symbol: Optional[str] = None, side: Optional[str] = None,
                    idempotency_key: Optional[str] = None):
         """EMERGENCY: cancel all open orders then close all positions for the
         resolved wallet. `confirm=True` is REQUIRED (no default) — the API's only
         deliberate-action gate is the mandatory Idempotency-Key, and this client
         auto-fills that, so `confirm` restores the conscious yes-I-mean-it step.
-        `scope` ("wallet"/"account") and `symbol` are functional params."""
+        `scope` ("wallet"/"account"), `symbol`, and `side` are functional params.
+        `side`: "all" (default) flattens both directions; "long" flattens long
+        positions + buy orders; "short" flattens short positions + sell orders."""
         if confirm is not True:
             raise ValueError(
                 "nuke() requires confirm=True — it cancels all orders and closes "
                 "all positions for the resolved wallet."
             )
         return await self._request("POST", "/v1/nuke",
-                                   body=self._body(scope=scope, symbol=symbol),
+                                   body=self._body(scope=scope, symbol=symbol,
+                                                   side=side),
                                    idempotency=True, idempotency_key=idempotency_key,
                                    mutating=True)
 

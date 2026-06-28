@@ -15,7 +15,8 @@ import asyncio
 
 from viper.examples._algo_rest_common import run_buy_algo
 
-ORDER = 7
+ORDER = 8
+SECTION = "Algorithms"
 DESCRIPTION = "Fire FlowBand (floating stealth scale) on BTC over REST — live ~$250, auto-cancels."
 
 

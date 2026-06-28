@@ -22,7 +22,8 @@ import asyncio
 
 from viper.examples._algo_common import run_algo
 
-ORDER = 2
+ORDER = 3
+SECTION = "Algorithms"
 DESCRIPTION = "Fire Glidemaker (passive limit) on BTC — live ~$250, auto-cancels."
 
 

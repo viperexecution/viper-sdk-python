@@ -24,7 +24,8 @@ from viper.examples._algo_rest_common import (
     require_env, instrument_mark, poll_and_cancel, ABORT_S, SYMBOL,
 )
 
-ORDER = 8
+ORDER = 9
+SECTION = "Algorithms"
 DESCRIPTION = "Arm Smart Exit (reduce-only stop) on an existing BTC long over REST — live, auto-cancels."
 
 

@@ -15,7 +15,8 @@ import asyncio
 
 from viper.examples._algo_rest_common import run_buy_algo
 
-ORDER = 5
+ORDER = 6
+SECTION = "Algorithms"
 DESCRIPTION = "Fire GhostSweep (hidden stop) on BTC over REST — live ~$250, auto-cancels."
 
 

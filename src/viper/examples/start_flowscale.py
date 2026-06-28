@@ -15,7 +15,8 @@ import asyncio
 
 from viper.examples._algo_rest_common import run_buy_algo
 
-ORDER = 6
+ORDER = 7
+SECTION = "Algorithms"
 DESCRIPTION = "Fire FlowScale (scaled ladder) on BTC over REST — live ~$250, auto-cancels."
 
 

@@ -46,7 +46,8 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 4
+ORDER = 5
+SECTION = "Algorithms"
 DESCRIPTION = "Detect a signal, then fire Glidemaker on BTC over REST — live ~$250, auto-cancels."
 
 SYMBOL = "BTC"

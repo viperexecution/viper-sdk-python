@@ -23,7 +23,8 @@ import asyncio
 
 from viper.examples._algo_common import run_algo
 
-ORDER = 3
+ORDER = 4
+SECTION = "Algorithms"
 DESCRIPTION = "Fire Pacemaker (TWAP) on BTC — live ~$250, auto-cancels."
 
 
