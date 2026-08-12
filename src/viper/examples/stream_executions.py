@@ -41,7 +41,7 @@ import asyncio
 
 from viper import ViperWSClient
 
-ORDER = 25
+ORDER = 26
 KIND = "ws"
 SECTION = "Streaming (WebSocket reads)"
 DESCRIPTION = "Watch all executions live (execution.list radar + auto-subscribed execution.state detail)."

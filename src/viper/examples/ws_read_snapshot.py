@@ -41,7 +41,7 @@ import asyncio
 
 from viper import ViperWSClient
 
-ORDER = 23
+ORDER = 24
 KIND = "ws"
 SECTION = "Streaming (WebSocket reads)"
 DESCRIPTION = "Read account state over the socket (Tier-2: get_balance/position/orders/fills)."

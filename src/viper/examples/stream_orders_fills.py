@@ -35,7 +35,7 @@ import asyncio
 
 from viper import ViperWSClient
 
-ORDER = 21
+ORDER = 22
 KIND = "ws"
 SECTION = "Streaming (WebSocket reads)"
 DESCRIPTION = "Stream a wallet's live orders/fills/positions (account.state), rendered."

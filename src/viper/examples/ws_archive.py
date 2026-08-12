@@ -31,7 +31,7 @@ import asyncio
 from viper import ViperWSClient, ViperRestClient
 
 
-ORDER = 32
+ORDER = 33
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Archive / unarchive finished executions over the socket (Tier-3: archive/unarchive/bulk)."

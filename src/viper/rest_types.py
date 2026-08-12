@@ -18,6 +18,10 @@ from typing import Any, Dict, List, Literal, TypedDict
 
 Side = Literal["buy", "sell"]
 Algo = Literal["pacemaker", "glidemaker", "ghostsweep", "flowscale", "flowband", "smart_exit"]
+IndicatorType = Literal[
+    "sma", "ema", "wma", "hma", "vwap", "bollinger", "keltner",
+    "donchian", "rsi", "stochastic", "macd", "atr", "obv", "volma",
+]
 
 
 # ---- request bodies ----------------------------------------------------------
@@ -46,6 +50,14 @@ class OrderRequest(TypedDict, total=False):
     client_order_id: str
     take_profit: float
     stop_loss: float
+
+
+class IndicatorItem(TypedDict, total=False):
+    """One entry in POST /v1/indicators/evaluate `indicators`. Params are
+    registry-declared per type; omitted keys use server defaults (echoed back
+    in `effective_params`)."""
+    type: IndicatorType
+    params: Dict[str, Any]
 
 
 # ---- response shapes (illustrative; runtime value is always the raw dict) ----
@@ -87,8 +99,30 @@ class PriceResult(TypedDict, total=False):
     spread_bps: float
 
 
+class Candle(TypedDict, total=False):
+    """One bar from GET /v1/candles/{symbol}. `t` is the bar OPEN time in
+    epoch seconds (UTC); the `candles` array carries closed bars only."""
+    t: int
+    o: float
+    h: float
+    l: float
+    c: float
+    v: float
+
+
+class IndicatorResult(TypedDict, total=False):
+    """One entry in POST /v1/indicators/evaluate `results`. `latest` maps each
+    output series key (e.g. upper/mid/lower for bollinger) to its value on the
+    evaluation bar — None while the indicator is still warming up."""
+    type: str
+    effective_params: Dict[str, Any]
+    latest: Dict[str, Any]
+    series: Dict[str, Any]
+
+
 __all__ = [
-    "Side", "Algo",
-    "ExecuteRequest", "OrderRequest",
+    "Side", "Algo", "IndicatorType",
+    "ExecuteRequest", "OrderRequest", "IndicatorItem",
     "ExecutionResult", "InstrumentRecord", "PriceResult",
+    "Candle", "IndicatorResult",
 ]

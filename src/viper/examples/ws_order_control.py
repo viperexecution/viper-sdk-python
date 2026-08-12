@@ -39,7 +39,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient
 
-ORDER = 26
+ORDER = 27
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Place + cancel an order over the socket (Tier-3: place_order/cancel_order)."

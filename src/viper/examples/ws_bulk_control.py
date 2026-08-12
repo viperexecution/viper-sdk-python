@@ -42,7 +42,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient
 
-ORDER = 31
+ORDER = 32
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Bulk-control the whole fleet over the socket (executions + monitors: pause/resume/cancel all)."

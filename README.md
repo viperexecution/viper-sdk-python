@@ -84,7 +84,7 @@ viper = ViperRestClient(
 
 ## Using the REST client
 
-`ViperRestClient` is async and instance-based (no global singleton). It covers the core trading surface: execute and executions, orders, account, positions, market data (instruments, price, orderbook), leverage, and limits.
+`ViperRestClient` is async and instance-based (no global singleton). It covers the core trading surface: execute and executions, orders, account, positions, market data (instruments, price, orderbook, candles, server-side indicators), leverage, and limits.
 
 ```python
 async with ViperRestClient.from_env() as viper:

@@ -245,6 +245,25 @@ class ViperRestClient:
         path = f"/v1/markets/{symbol}/stats" if symbol else "/v1/markets/stats"
         return await self._request("GET", path)
 
+    async def candles(self, symbol: str, *, interval: str,
+                      limit: Optional[int] = None,
+                      include_forming: Optional[bool] = None):
+        query = self._body(interval=interval, limit=limit,
+                           include_forming=include_forming)
+        return await self._request("GET", f"/v1/candles/{symbol}", query=query)
+
+    # evaluate_indicators is a read (preview pattern): nothing is placed,
+    # no Idempotency-Key, no throttle. POST only because the batch body
+    # doesn't fit a query string.
+    async def evaluate_indicators(self, *, symbol: str, interval: str,
+                                  indicators: list,
+                                  depth: Optional[int] = None,
+                                  include_forming: Optional[bool] = None):
+        body = self._body(symbol=symbol, interval=interval,
+                          indicators=indicators, depth=depth,
+                          include_forming=include_forming)
+        return await self._request("POST", "/v1/indicators/evaluate", body=body)
+
     # leverage (read)
     async def leverage(self, symbol: str): return await self._request("GET", f"/v1/leverage/{symbol}")
 

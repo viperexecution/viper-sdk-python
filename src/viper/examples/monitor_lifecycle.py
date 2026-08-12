@@ -38,7 +38,7 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 18
+ORDER = 19
 SECTION = "Monitors"
 DESCRIPTION = "Create a monitor, fire its algo on trigger, re-arm, and delete it."
 
