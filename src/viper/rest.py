@@ -323,6 +323,18 @@ class ViperRestClient:
                                    idempotency=True, idempotency_key=idempotency_key,
                                    mutating=True)
 
+    async def set_position_tpsl(self, *, symbol: str,
+                                take_profit: Optional[dict] = None,
+                                stop_loss: Optional[dict] = None,
+                                idempotency_key: Optional[str] = None, **extra):
+        """Attach venue-coupled whole-position TP/SL. Each leg carries an
+        absolute ``price`` or an indicator ``offset`` dict — see the API
+        reference for TpSlLeg / TpSlOffsetSpec."""
+        body = self._body(take_profit=take_profit, stop_loss=stop_loss, **extra)
+        return await self._request("POST", f"/v1/positions/{symbol}/tpsl",
+                                   body=body, idempotency=True,
+                                   idempotency_key=idempotency_key, mutating=True)
+
     async def close_all(self, *, idempotency_key: Optional[str] = None):
         return await self._request("POST", "/v1/positions/close-all", body={},
                                    idempotency=True, idempotency_key=idempotency_key,
