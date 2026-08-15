@@ -14,7 +14,7 @@ not guarantees.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, TypedDict
+from typing import Any, Dict, List, Literal, TypedDict, Union
 
 Side = Literal["buy", "sell"]
 Algo = Literal["pacemaker", "glidemaker", "ghostsweep", "flowscale", "flowband", "smart_exit"]
@@ -22,12 +22,94 @@ IndicatorType = Literal[
     "sma", "ema", "wma", "hma", "vwap", "bollinger", "keltner",
     "donchian", "rsi", "stochastic", "macd", "atr", "obv", "volma",
 ]
+Interval = Literal["1m", "5m", "15m", "1h", "4h", "1d"]
+
+#: Indicators whose value is a PRICE, so it can serve as a level. These are the
+#: only ones accepted by ``at`` legs, by a level-``trail`` (no ``mult``), by
+#: ``price_from`` and by ``indicator_level`` monitors. Oscillators, volume
+#: series and ``atr`` are rejected 422 there -- "SL at RSI(60)" would be a $60
+#: stop. ``offset`` legs accept every indicator, because the multiplier makes
+#: any series usable as a distance.
+PriceLevelIndicator = Literal[
+    "sma", "ema", "wma", "hma", "vwap", "bollinger", "keltner", "donchian",
+]
+
+
+# ---- TP/SL composition legs --------------------------------------------------
+
+class TpSlOffsetSpec(TypedDict, total=False):
+    """``offset`` leg: trigger = anchor +/- ``mult`` x indicator value.
+
+    Accepts EVERY registry indicator. Resolved at fill time (orders) or at
+    terminal state (executions), anchored to the actual average fill price,
+    and echoed back in full.
+    """
+    mult: float
+    indicator: IndicatorType
+    params: Dict[str, Any]
+    interval: Interval
+    series: str
+    anchor: Literal["entry", "mark"]
+
+
+class TpSlAtSpec(TypedDict, total=False):
+    """``at`` leg: the trigger price IS the indicator's value on the last
+    closed bar -- SL at the lower Bollinger, TP at the Donchian upper.
+
+    ``indicator`` is restricted to the price-dimensioned set. Side-sanity is
+    enforced at resolution: an SL resolving above a long's entry (or a TP
+    below) is rejected 422 with the resolved value in the detail.
+    """
+    indicator: PriceLevelIndicator
+    params: Dict[str, Any]
+    interval: Interval
+    series: str
+
+
+class TpSlTrailSpec(TypedDict, total=False):
+    """``trail`` leg, maintained by the exit engine on each closed bar.
+
+    Three modes, and the valid ``indicator`` set differs between them:
+
+    * distance-trail -- ``indicator`` + ``mult``; ``atr`` ONLY
+    * level-trail    -- ``indicator``, no ``mult``; price-dimensioned only
+    * percent-trail  -- ``pct``, no ``indicator``
+
+    SL trails only ever tighten; TP trails follow the level both ways. A venue
+    modify is issued only once the new trigger moves ``min_move_bps`` from the
+    resting one, and the resting order's client_order_id survives modifies.
+    """
+    indicator: IndicatorType
+    params: Dict[str, Any]
+    interval: Interval
+    series: str
+    mult: float
+    pct: float
+    min_move_bps: float
+
+
+class TpSlLeg(TypedDict, total=False):
+    """One TP or SL leg -- **exactly one** of ``price`` / ``offset`` / ``at`` /
+    ``trail``.
+
+    TypedDict cannot express that exclusivity, so all four are declared
+    optional here and the server enforces it (422 on zero or on more than one).
+    """
+    price: float
+    offset: TpSlOffsetSpec
+    at: TpSlAtSpec
+    trail: TpSlTrailSpec
 
 
 # ---- request bodies ----------------------------------------------------------
 
 class ExecuteRequest(TypedDict, total=False):
-    """POST /v1/execute. `params` is per-algo (discriminated on `algo`)."""
+    """POST /v1/execute. `params` is per-algo (discriminated on `algo`).
+
+    ``take_profit`` / ``stop_loss`` arm when the execution reaches a terminal
+    state with fills, anchored to the algo's average fill price and sized to
+    the accumulated fill. All six algos accept them.
+    """
     algo: Algo
     symbol: str
     side: Side
@@ -35,21 +117,35 @@ class ExecuteRequest(TypedDict, total=False):
     params: Dict[str, Any]
     reduce_only: bool
     post_only: bool
+    take_profit: TpSlLeg
+    stop_loss: TpSlLeg
 
 
 class OrderRequest(TypedDict, total=False):
-    """POST /v1/order — a single resting/marketable order."""
+    """POST /v1/order — a single resting/marketable order.
+
+    ``take_profit`` / ``stop_loss`` accept either a bare number (absolute
+    trigger price, the legacy form) or a :class:`TpSlLeg`. On a resting or
+    partially filled entry, ``offset`` and ``at`` legs register with the
+    persistent fill-watcher and report ``queued=true``; on a filled entry they
+    resolve immediately against the actual average fill price.
+
+    ``price_from`` resolves the LIMIT price from an indicator once at
+    submission and echoes ``price_from_resolution``. Limit orders only, and
+    exactly one of ``price`` or ``price_from``.
+    """
     symbol: str
     side: Side
     size: float
     order_type: str          # "limit" | "market" | ...
     price: float
+    price_from: TpSlAtSpec
     time_in_force: str
     post_only: bool
     reduce_only: bool
     client_order_id: str
-    take_profit: float
-    stop_loss: float
+    take_profit: Union[float, TpSlLeg]
+    stop_loss: Union[float, TpSlLeg]
 
 
 class IndicatorItem(TypedDict, total=False):
@@ -121,7 +217,8 @@ class IndicatorResult(TypedDict, total=False):
 
 
 __all__ = [
-    "Side", "Algo", "IndicatorType",
+    "Side", "Algo", "IndicatorType", "Interval", "PriceLevelIndicator",
+    "TpSlOffsetSpec", "TpSlAtSpec", "TpSlTrailSpec", "TpSlLeg",
     "ExecuteRequest", "OrderRequest", "IndicatorItem",
     "ExecutionResult", "InstrumentRecord", "PriceResult",
     "Candle", "IndicatorResult",

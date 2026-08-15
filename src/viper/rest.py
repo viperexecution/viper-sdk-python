@@ -327,9 +327,26 @@ class ViperRestClient:
                                 take_profit: Optional[dict] = None,
                                 stop_loss: Optional[dict] = None,
                                 idempotency_key: Optional[str] = None, **extra):
-        """Attach venue-coupled whole-position TP/SL. Each leg carries an
-        absolute ``price`` or an indicator ``offset`` dict — see the API
-        reference for TpSlLeg / TpSlOffsetSpec."""
+        """Attach venue-coupled whole-position TP/SL.
+
+        Each leg carries **exactly one** of four forms (:class:`TpSlLeg`)::
+
+            {"price":  68000.0}                      # absolute trigger
+            {"offset": {"indicator": "atr", "mult": 1.8, "interval": "1h"}}
+            {"at":     {"indicator": "bollinger", "series": "lower",
+                        "interval": "1h"}}
+            {"trail":  {"indicator": "atr", "mult": 2.0, "interval": "1h"}}
+
+        ``offset`` and ``at`` resolve once, against the position's entry.
+        ``trail`` is re-resolved by the exit engine on each closed bar and
+        ratchets in the protective direction only; watch its progress on the
+        ``tpsl.watch`` stream channel.
+
+        ``at`` and level-``trail`` accept price-dimensioned indicators only
+        (:data:`PriceLevelIndicator`); a distance-``trail`` (with ``mult``)
+        accepts ``atr`` only. Omitting ``series`` on a band indicator selects
+        ``upper`` -- an SL on a long usually wants ``lower``.
+        """
         body = self._body(take_profit=take_profit, stop_loss=stop_loss, **extra)
         return await self._request("POST", f"/v1/positions/{symbol}/tpsl",
                                    body=body, idempotency=True,
