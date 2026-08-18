@@ -41,7 +41,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient
 
-ORDER = 29
+ORDER = 35
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Drive a live algo over the socket (Tier-3: start/pause/patch/resume/cancel)."

@@ -37,7 +37,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient
 
-ORDER = 28
+ORDER = 34
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Modify + bulk-cancel resting orders over the socket (Tier-3: modify_order/bulk_cancel)."

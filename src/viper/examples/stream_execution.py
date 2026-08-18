@@ -46,7 +46,7 @@ import asyncio
 from viper import ViperWSClient, ViperRestClient, ViperError
 
 
-ORDER = 25
+ORDER = 30
 KIND = "ws"
 SECTION = "Streaming (WebSocket reads)"
 DESCRIPTION = "Stream one execution's lifecycle (execution.state) — the reliable per-execution channel."

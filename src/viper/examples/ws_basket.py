@@ -38,7 +38,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient
 
-ORDER = 31
+ORDER = 37
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Launch a multi-leg basket over the socket (Tier-3: place_basket, atomic)."

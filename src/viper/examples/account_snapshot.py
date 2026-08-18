@@ -26,7 +26,7 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 15
+ORDER = 20
 SECTION = "Account & Market Data"
 DESCRIPTION = "Account snapshot: equity, balances, builder, fees, PnL, positions, fills."
 

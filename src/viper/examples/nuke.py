@@ -41,7 +41,7 @@ import asyncio
 from viper import ViperRestClient, ViperError
 
 
-ORDER = 18
+ORDER = 23
 KIND = "rest"
 SECTION = "Account & Market Data"
 DESCRIPTION = "Emergency flatten: cancel orders + close positions, optionally by side (POST /v1/nuke)."

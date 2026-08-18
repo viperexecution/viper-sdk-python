@@ -43,7 +43,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient, ViperError
 
-ORDER = 23
+ORDER = 28
 KIND = "ws"
 SECTION = "Streaming (WebSocket reads)"
 DESCRIPTION = "Stream a monitor's lifecycle (monitor.* channels) live over WebSocket."

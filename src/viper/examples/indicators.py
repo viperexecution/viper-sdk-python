@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 17
+ORDER = 22
 KIND = "rest"
 SECTION = "Account & Market Data"
 DESCRIPTION = "Candles + batch server-side indicators (ATR/Bollinger/EMA/RSI) on the last closed bar."

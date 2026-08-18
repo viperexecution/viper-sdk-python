@@ -41,7 +41,7 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 20
+ORDER = 25
 SECTION = "Monitors"
 DESCRIPTION = "Drive a monitor's lifecycle (create/pause/trigger/reset) — pair with stream-monitors."
 

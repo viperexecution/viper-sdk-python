@@ -32,7 +32,7 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 16
+ORDER = 21
 SECTION = "Account & Market Data"
 DESCRIPTION = "List executions with full detail (GET /v1/executions) — the reliable execution roster."
 

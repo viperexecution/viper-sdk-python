@@ -28,7 +28,7 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 14
+ORDER = 19
 SECTION = "Account & Market Data"
 DESCRIPTION = "Full metadata for one instrument (GET /v1/instruments/{symbol})."
 

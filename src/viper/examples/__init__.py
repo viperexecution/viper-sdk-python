@@ -95,6 +95,7 @@ def _print_env_setup() -> None:
 _SECTION_ORDER = [
     "Getting Started",
     "Algorithms",
+    "TP/SL & Exits",
     "Account & Market Data",
     "Monitors",
     "Streaming (WebSocket reads)",

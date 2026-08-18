@@ -38,7 +38,7 @@ import asyncio
 
 from viper import ViperWSClient, ViperRestClient
 
-ORDER = 30
+ORDER = 36
 KIND = "ws"
 SECTION = "Trading over WebSocket (Tier-3 writes)"
 DESCRIPTION = "Sweep an algo's remaining size to market over the socket (Tier-3: complete_at_market — fills)."

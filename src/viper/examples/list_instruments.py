@@ -27,7 +27,7 @@ import asyncio
 
 from viper import ViperRestClient, ViperError
 
-ORDER = 13
+ORDER = 18
 SECTION = "Account & Market Data"
 DESCRIPTION = "List tradeable instruments, grouped by kind, top N by 24h volume."
 
