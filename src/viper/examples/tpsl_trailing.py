@@ -61,6 +61,8 @@ def _items(r):
 def _leg(r: dict | None) -> str:
     if not r:
         return "n/a"
+    if not r.get("success"):
+        return f"REFUSED: {r.get('error')}"
     res = r.get("resolution") or {}
     out = f"oid={r.get('order_id')}  trigger={r.get('trigger_price')}"
     if res:
@@ -107,8 +109,8 @@ async def main() -> None:
                                    "interval": "1m"}})
         print("attached (venue-coupled — sized to the position, "
               "auto-cancel on close):")
-        print(f"   sl (distance trail): {_leg(r.get('sl_order'))}")
-        print(f"   tp (level trail):    {_leg(r.get('tp_order'))}")
+        print(f"   sl (distance trail): {_leg(r.get('sl'))}")
+        print(f"   tp (level trail):    {_leg(r.get('tp'))}")
 
         before = await _triggers(rest, symbol)
         print(f"\nwaiting {wait_s:g}s (>= one closed 1m bar) for the exit "
