@@ -29,6 +29,10 @@ sibling (see `tpsl-troubleshooting` for what failure looks like).
 Fires REAL orders on mainnet (~$15 notional default), tidies up fully.
 
 Run (after `pip install viper-execution`):
+    export VIPER_API_KEY=vk_...
+    export VIPER_API_SECRET=vs_...
+    export VIPER_HANDLE=your-handle
+    export VIPER_WALLET=0x...
     viper-examples tpsl-order-legs
 
 Tuning (optional env vars):

@@ -27,6 +27,10 @@ On the streaming side the same discipline appears as `leg_failed`
 Fires ONE real ~$15 market order on mainnet (case 1); tidies up.
 
 Run (after `pip install viper-execution`):
+    export VIPER_API_KEY=vk_...
+    export VIPER_API_SECRET=vs_...
+    export VIPER_HANDLE=your-handle
+    export VIPER_WALLET=0x...
     viper-examples tpsl-troubleshooting
 
 Tuning (optional env vars):

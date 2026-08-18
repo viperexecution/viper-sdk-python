@@ -20,6 +20,10 @@ cancels.
 Fires a REAL resting order on mainnet (~$15 notional); tidies up.
 
 Run (after `pip install viper-execution`):
+    export VIPER_API_KEY=vk_...
+    export VIPER_API_SECRET=vs_...
+    export VIPER_HANDLE=your-handle
+    export VIPER_WALLET=0x...
     viper-examples price-from-entry
 
 Tuning (optional env vars):

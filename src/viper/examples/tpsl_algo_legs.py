@@ -24,6 +24,10 @@ Sequence:
 Fires a REAL ~$250 Glidemaker on mainnet; fills partially; tidies up.
 
 Run (after `pip install viper-execution`):
+    export VIPER_API_KEY=vk_...
+    export VIPER_API_SECRET=vs_...
+    export VIPER_HANDLE=your-handle
+    export VIPER_WALLET=0x...
     viper-examples tpsl-algo-legs
 
 Tuning (optional env vars):

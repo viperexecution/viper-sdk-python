@@ -28,6 +28,10 @@ fault.
 Fires a REAL ~$15 position on mainnet; tidies up fully.
 
 Run (after `pip install viper-execution`):
+    export VIPER_API_KEY=vk_...
+    export VIPER_API_SECRET=vs_...
+    export VIPER_HANDLE=your-handle
+    export VIPER_WALLET=0x...
     viper-examples tpsl-trailing
 
 Tuning (optional env vars):
