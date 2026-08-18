@@ -32,6 +32,9 @@ fill. Then tidies up.
 
 Fires a REAL ~$250 Glidemaker on mainnet; fills partially; tidies up.
 
+Run ONE instance per wallet+symbol at a time: the tidy-up cancels ALL
+resting orders on the symbol, including a concurrent run's.
+
 Run (after `pip install viper-execution`):
     export VIPER_API_KEY=vk_...
     export VIPER_API_SECRET=vs_...
@@ -147,23 +150,37 @@ async def main() -> None:
 
             # Wait for partial fills, then stop -> the [placed] frame arms.
             stopped = False
+            polls = 0
             deadline = asyncio.get_event_loop().time() + ceiling
             while asyncio.get_event_loop().time() < deadline:
                 await asyncio.sleep(5)
+                polls += 1
                 ex = await rest.execution(eid)
                 st = (ex.get("state") or {}) if isinstance(ex.get("state"), dict) else ex
                 filled = float(st.get("filled_size") or ex.get("filled_size") or 0)
                 status = st.get("status") or ex.get("status")
+                if not stopped and filled <= 0 and polls % 6 == 0:
+                    print(f"  …waiting for fills (status={status}, quiet market)")
                 if not stopped and filled > 0:
                     print(f"\npartial fill ({filled:g}) — stopping the algo; "
                           f"the stop arms sized to this fill\n")
                     await rest.cancel_execution(eid)
                     stopped = True
+                    # Keep listening past the ceiling so the [placed] frame
+                    # is caught even when the fill lands at ceiling-expiry.
+                    deadline = max(deadline,
+                                   asyncio.get_event_loop().time() + 20)
                 if stopped and _seen_placed:
                     await asyncio.sleep(8)   # catch a possible re-size frame
                     break
                 if status not in ("running", "pending", "paused") and not stopped:
                     break
+            if not _seen_placed and stopped:
+                print("  (no [placed] frame observed before exit — check the "
+                      "venue for the trigger; the tidy-up below clears it)")
+            elif not stopped:
+                print("\nno fills within the ceiling — nothing to protect; "
+                      "the watch retires at terminal. Tidying.")
         finally:
             try:
                 await ws.close()
