@@ -76,8 +76,12 @@ async def main() -> None:
                                   "interval": "1h"}})
         eid = r.get("execution_id")
         print(f"launched {eid}  requested={size:g} {symbol}")
-        print(f"sl leg: queued={((r.get('sl_order') or {}).get('queued'))} "
-              f"(arms at terminal state with fills)\n")
+        sl_ack = r.get("sl_order") or {}
+        if sl_ack.get("queued"):
+            print("sl leg: queued=True (arms at terminal state with fills)\n")
+        else:
+            print("sl leg: registered as a watch — arms at terminal state "
+                  "with fills\n")
 
         # 2) Wait for the FIRST partial fills, then stop immediately —
         #    filled < requested is what makes the sizing visible.
