@@ -1,5 +1,9 @@
 """
-Viper SDK — runnable examples.
+Viper SDK — quickstart examples.
+
+Four examples ship in the package (getting started, preview, place order,
+stream account state). The full example set is available to account holders
+in the app under API.
 
 Each example is a module in this package that exposes:
 
@@ -106,7 +110,7 @@ _SECTION_ORDER = [
 def _print_catalog(catalog) -> None:
     print("Viper SDK — Examples")
     print("====================")
-    print("Runnable examples shipped with the SDK. Run one by name or number:\n")
+    print("Quickstart examples shipped with the SDK. Run one by name or number:\n")
     print("    viper-examples <name>\n")
     if not catalog:
         print("  (no examples found)")
@@ -124,6 +128,9 @@ def _print_catalog(catalog) -> None:
             for slug, _mod, order, desc, kind, _section in by_section[sec]:
                 tag = "[WS]  " if kind == "ws" else "[REST]"
                 print(f"  {order:02d}  {tag}  {slug.ljust(width)}   {desc}")
+    print()
+    print("36 more examples for account holders — sign in at "
+          "app.viperexecution.com → API.")
     print()
     _print_env_setup()
     print()

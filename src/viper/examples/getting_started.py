@@ -121,7 +121,8 @@ async def main() -> None:
 
             _hr("DONE")
             print("   Setup confirmed. Next: try `viper-examples preview-algo` (dry-run),")
-            print("   then `viper-examples start-glidemaker` for a live ~$250 test.")
+            print("   then `viper-examples place-order` for a live test. The full example")
+            print("   set is in the app under API.")
 
     except ViperError as e:
         print(f"\nViper error: {e}")

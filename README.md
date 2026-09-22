@@ -2,7 +2,7 @@
 
 Institutional-grade Python client for the [Viper Execution](https://viperexecution.com) trading API on Hyperliquid.
 
-> **Status:** SDK `0.2.x`. Ships a typed async REST client (`ViperRestClient`) and a resilient WebSocket client (`ViperWSClient`). The SDK version is independent of the API version — this is SDK 0.x against API v1.
+> **Status:** SDK `0.7.x`. Ships a typed async REST client (`ViperRestClient`) and a resilient WebSocket client (`ViperWSClient`). The SDK version is independent of the API version — this is SDK 0.x against API v1.
 
 The SDK is a convenience layer over the raw HMAC + REST/WebSocket surface — never required. Every response is returned as a plain `dict`, so you are never boxed out of the raw payload; the typed signatures and `TypedDict` hints are there for editor and type-checker support only.
 
@@ -136,14 +136,25 @@ except ViperConflictError as e:
 
 ## Runnable examples
 
-Examples ship inside the package — no extra downloads. List the catalog and
-run one by name or number:
+Four quickstart examples ship inside the package — no extra downloads. List
+them and run one by name or number:
 
 ```bash
-viper-examples                          # list the catalog
+viper-examples                          # list the quickstarts
 viper-examples stream-account-state     # run by name
 viper-examples 01                       # ...or by number
 ```
+
+| | Example | What it does |
+|---|---|---|
+| 00 | `getting-started` | Confirm setup and see your account: connections, balance, positions, orders, fills. |
+| 01 | `preview-algo` | Dry-run all six algos via `/v1/execute/preview` — no orders placed. |
+| 02 | `place-order` | Place limit, market and limit + TP/SL orders over REST (live, tidies up). |
+| 03 | `stream-account-state` | Stream `account.state`; route frames by `data.wallet`. |
+
+The full example set — every algorithm, TP/SL and trailing exits, monitors,
+baskets, the streaming channels and the WebSocket write tier — is available to
+account holders in the app under **API**.
 
 Set the env vars the examples read — bash/zsh:
 
@@ -163,39 +174,11 @@ $env:VIPER_HANDLE = "your-handle"   # optional
 $env:VIPER_WALLET = "0x..."         # the wallet to trade/stream
 ```
 
-### Live algo examples
+`place-order` places **real orders on mainnet** (there is no testnet). It
+discloses exactly what it will do with a short Ctrl-C abort window, fires
+once, then tidies up.
 
-Several examples fire a real algo. They place **real orders on mainnet** (there
-is no testnet). Each reads the live BTC mark, sizes to a USD notional (default
-~$250), discloses exactly what it will do with a short Ctrl-C abort window, fires
-**once**, observes, then cancels.
-
-Over the WebSocket command surface:
-
-```bash
-viper-examples start-glidemaker     # passive limit
-viper-examples start-pacemaker      # TWAP
-```
-
-Over the REST client:
-
-```bash
-viper-examples detect-and-fire-glidemaker   # poll a signal, then fire on it
-viper-examples start-ghostsweep             # hidden stop
-viper-examples start-flowscale              # scaled ladder
-viper-examples start-flowband               # floating stealth scale
-viper-examples smart-exit                   # reduce-only stop on an existing long
-```
-
-Optional knobs:
-
-```bash
-export VIPER_EXAMPLE_USD=250         # target notional (default 250)
-export VIPER_EXAMPLE_OBSERVE_S=10    # seconds to observe before cancel (default 10)
-export VIPER_EXAMPLE_NO_CANCEL=1     # leave the execution running instead of cancelling
-```
-
-The source for each example lives in
+The source for each quickstart lives in
 [`src/viper/examples/`](src/viper/examples/).
 
 ## What the WebSocket client handles for you

@@ -18,7 +18,7 @@ import asyncio
 
 from viper import ViperWSClient
 
-ORDER = 26
+ORDER = 3
 KIND = "ws"
 SECTION = "Streaming (WebSocket reads)"
 DESCRIPTION = "Stream account.state; route frames by data.wallet."
