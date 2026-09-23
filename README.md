@@ -102,7 +102,7 @@ async with ViperRestClient.from_env() as viper:
 What the client handles for you:
 
 - **Signing** — HMAC-SHA256 over the canonical `{timestamp}{method}{path}{body}`, signed over the exact bytes sent. You never construct a signature.
-- **Idempotency** — every mutating call (`execute`, `place_order`, `cancel_*`, `modify_order`, `close_*`, execution lifecycle, `set_leverage`, `update_settings`, `nuke`) auto-generates an `Idempotency-Key` unless you pass one. Reads don't.
+- **Idempotency** — every mutating call (`execute`, `place_order`, `place_ladder`, `cancel_*`, `modify_order`, `close_*`, execution lifecycle, `set_leverage`, `update_settings`, `nuke`) auto-generates an `Idempotency-Key` unless you pass one. Reads don't.
 - **Replay spacing** — a per-instance throttle keeps mutating calls ≥ 1.1s apart; reads are never blocked.
 - **Configurable transport** — inject your own `httpx.AsyncClient` via `http_client=...` to set timeouts, proxies, or pools.
 

@@ -316,6 +316,32 @@ class ViperRestClient:
                                    idempotency=True, idempotency_key=idempotency_key,
                                    mutating=True)
 
+    async def place_ladder(self, *, symbol: str, side: str,
+                           total_size: float, ladder: dict,
+                           vehicle: Optional[str] = None,
+                           idempotency_key: Optional[str] = None, **extra):
+        """Enter across 2-10 portion-sized levels in ONE validated
+        request (``POST /v1/orders/ladder``). ``ladder`` is the ladder
+        spec — anchored form::
+
+            {"anchor": {"price": 60000.0},         # or {"from": {...}}
+             "levels": [{"offset_pct": -1.0, "portion_pct": 50},
+                        {"offset_pct": -2.0, "portion_pct": 50}]}
+
+        Portions must sum to exactly 100 (max 2 decimals). ``vehicle``:
+        ``"limit"`` (default — levels are limit orders;
+        ``time_in_force``/``post_only`` apply) or ``"ghostsweep"``
+        (levels are portion-sized GhostSweep executions triggered at
+        their level; ``label``/``gs`` apply). An indicator anchor with
+        ``"track": true`` moves the whole ladder rigidly on each closed
+        bar. Everything validates before anything places; per-level
+        results come back individually."""
+        body = self._body(symbol=symbol, side=side, total_size=total_size,
+                          vehicle=vehicle, ladder=ladder, **extra)
+        return await self._request("POST", "/v1/orders/ladder", body=body,
+                                   idempotency=True, idempotency_key=idempotency_key,
+                                   mutating=True)
+
     async def close_position(self, *, symbol: str, size: Optional[float] = None,
                              idempotency_key: Optional[str] = None):
         return await self._request("POST", "/v1/positions/close",
